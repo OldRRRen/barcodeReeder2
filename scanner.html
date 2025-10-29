@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barkod Okuyucu</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <style>
+        .camera-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        #reader {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .btn-group {
+            margin: 15px 0;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📷 Barkod Tarayıcı</h1>
+        
+        <div class="camera-container">
+            <div class="btn-group">
+                <button onclick="startCamera()" id="start-btn">🎥 Kamerayı Aç</button>
+                <button onclick="stopCamera()" id="stop-btn" style="display:none;">⏹️ Kamerayı Kapat</button>
+            </div>
+            
+            <div id="reader"></div>
+            <div id="camera-status">Kamera hazır...</div>
+        </div>
+
+        <div id="result"></div>
+
+        <div class="btn-group">
+            <button onclick="testBarcode()" style="background: #ff9800;">🧪 Test Barkodu Dene</button>
+            <button onclick="simulateBarcode('8691234567890')" style="background: #2196F3;">🥤 Coca Cola Test</button>
+            <button onclick="simulateBarcode('8699876543210')" style="background: #9C27B0;">🍫 Browni Test</button>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <a href="index.html" class="back-btn">← Ana Sayfa</a>
+        </div>
+    </div>
+
+    <script src="js/scanner.js"></script>
+</body>
+</html>

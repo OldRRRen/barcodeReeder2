@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ürün Yönetimi</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>⚙️ Ürün Yönetimi</h1>
+        
+        <div id="productForm">
+            <h3>➕ Yeni Ürün Ekle</h3>
+            <div class="form-group">
+                <input type="text" id="barcode" placeholder="Barkod Numarası (13 haneli)" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="name" placeholder="Ürün Adı" required>
+            </div>
+            <div class="form-group">
+                <input type="number" id="price" placeholder="Fiyat (TL)" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <textarea id="description" placeholder="Ürün Açıklaması" rows="3"></textarea>
+            </div>
+            <button onclick="addProduct()">💾 Ürünü Kaydet</button>
+        </div>
+
+        <hr style="margin: 30px 0;">
+        
+        <h3>📦 Mevcut Ürünler (Toplam: <span id="productCount">0</span>)</h3>
+        <div id="productList"></div>
+        
+        <div style="margin-top: 20px;">
+            <button onclick="exportProducts()" style="background: #2196F3;">📤 JSON Olarak Dışa Aktar</button>
+            <button onclick="addSampleProducts()" style="background: #ff9800;">🎯 Örnek Ürünler Ekle</button>
+            <button onclick="clearAll()" style="background: #f44336;">🗑️ Tümünü Temizle</button>
+        </div>
+        
+        <a href="index.html" class="back-btn">← Ana Sayfa</a>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>
