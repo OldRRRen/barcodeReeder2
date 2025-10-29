@@ -1,6 +1,29 @@
-// js/scanner.js - GÜNCELLENMİŞ
+// js/scanner.js - GÜNCELLENMİŞ ve GÜVENLİ
 let html5QrcodeScanner = null;
 let isScanning = false;
+
+// Manuel barkod kontrolü
+function checkManualBarcode() {
+    const barcode = document.getElementById('manual-barcode').value.trim();
+    if (barcode.length === 0) {
+        alert('Lütfen barkod numarası girin!');
+        return;
+    }
+    getProductInfo(barcode);
+}
+
+// Enter tuşu ile kontrol
+document.getElementById('manual-barcode')?.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        checkManualBarcode();
+    }
+});
+
+// Test barkodu
+function testBarcode(barcode) {
+    document.getElementById('manual-barcode').value = barcode;
+    getProductInfo(barcode);
+}
 
 // Kamerayı başlat
 async function startCamera() {
@@ -9,41 +32,33 @@ async function startCamera() {
     try {
         console.log('Kamera başlatılıyor...');
         
-        // Önce izin iste
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { 
-                facingMode: "environment" // Arka kamerayı kullan
-            } 
-        });
-        
-        // İzin alındı, stream'i durdur (Html5Qrcode kendi yönetecek)
-        stream.getTracks().forEach(track => track.stop());
+        // Html5Qrcode kontrolü
+        if (typeof Html5Qrcode === 'undefined') {
+            throw new Error('QR kütüphanesi yüklenemedi. Manuel giriş kullanın.');
+        }
         
         document.getElementById('start-btn').style.display = 'none';
         document.getElementById('stop-btn').style.display = 'inline-block';
-        document.getElementById('camera-status').innerHTML = '🟢 Kamera açıldı - Barkodu gösterin';
+        document.getElementById('camera-status').innerHTML = '🟢 Kamera başlatılıyor...';
         
         // Html5Qrcode'u başlat
         html5QrcodeScanner = new Html5Qrcode("reader");
         
         const config = {
             fps: 10,
-            qrbox: { width: 250, height: 150 },
-            aspectRatio: 1.0
+            qrbox: { width: 250, height: 150 }
         };
 
         // Kamerayı başlat
-        const cameras = await Html5Qrcode.getCameras();
-        const cameraId = cameras[0].id; // İlk kamerayı kullan
-        
         await html5QrcodeScanner.start(
-            cameraId,
+            { facingMode: "environment" },
             config,
             onScanSuccess,
             onScanFailure
         );
         
         isScanning = true;
+        document.getElementById('camera-status').innerHTML = '🟢 Kamera açıldı - Barkodu gösterin';
         console.log('Kamera başarıyla başlatıldı');
         
     } catch (err) {
@@ -51,9 +66,10 @@ async function startCamera() {
         document.getElementById('camera-status').innerHTML = `
             <div style="color: red; background: #ffebee; padding: 10px; border-radius: 5px;">
                 ❌ Kamera hatası: ${err.message}
-                <br><small>1. Kamera izni verin<br>2. HTTPS kullanın<br>3. Test butonlarını deneyin</small>
+                <br><small>Manuel barkod girişini kullanabilirsiniz.</small>
             </div>
         `;
+        resetCamera();
     }
 }
 
@@ -63,16 +79,20 @@ async function stopCamera() {
     
     try {
         await html5QrcodeScanner.stop();
-        html5QrcodeScanner = null;
-        isScanning = false;
-        
-        document.getElementById('start-btn').style.display = 'inline-block';
-        document.getElementById('stop-btn').style.display = 'none';
-        document.getElementById('camera-status').innerHTML = 'Kamera kapandı';
+        resetCamera();
+        document.getElementById('camera-status').innerHTML = '⏹️ Kamera kapandı';
         
     } catch (err) {
         console.error('Kamera durdurma hatası:', err);
+        resetCamera();
     }
+}
+
+function resetCamera() {
+    isScanning = false;
+    html5QrcodeScanner = null;
+    document.getElementById('start-btn').style.display = 'inline-block';
+    document.getElementById('stop-btn').style.display = 'none';
 }
 
 // Barkod okunduğunda
@@ -82,8 +102,7 @@ function onScanSuccess(decodedText, decodedResult) {
 }
 
 function onScanFailure(error) {
-    // Hata mesajını gösterme, sadece konsola yaz
-    // console.log('Tarama devam ediyor...');
+    // Hata mesajını gösterme
 }
 
 // Ürün bilgilerini getir
@@ -109,24 +128,13 @@ function getProductInfo(barcode) {
                 <h3>❌ Ürün Bulunamadı</h3>
                 <p><strong>🏷️ Barkod:</strong> ${barcode}</p>
                 <p>Bu ürün sisteme kayıtlı değil.</p>
-                <p>Lütfen admin panelinden ekleyin.</p>
+                <p><a href="admin.html" style="color: #4CAF50;">Ürün eklemek için tıklayın</a></p>
             </div>
         `;
     }
 }
 
-// Test fonksiyonları
-function testBarcode() {
-    const testBarcodes = ["8691234567890", "8699876543210", "8695555555555", "1234567890123"];
-    const randomBarcode = testBarcodes[Math.floor(Math.random() * testBarcodes.length)];
-    getProductInfo(randomBarcode);
-}
-
-function simulateBarcode(barcode) {
-    getProductInfo(barcode);
-}
-
-// Sayfa yüklendiğinde örnek ürünleri ekle
+// Sayfa yüklendiğinde
 document.addEventListener('DOMContentLoaded', function() {
     // Örnek ürünler ekle (eğer yoksa)
     const existingProducts = JSON.parse(localStorage.getItem('products')) || [];
@@ -155,5 +163,5 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Örnek ürünler eklendi');
     }
     
-    console.log('Scanner hazır. Test butonlarını kullanabilirsiniz.');
+    console.log('Scanner hazır. Manuel giriş veya kamera kullanabilirsiniz.');
 });
